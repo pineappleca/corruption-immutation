@@ -1,9 +1,27 @@
+# import sys
+# sys.path.append('utils')
+
+
+# import utils.imgaug.augmenters as iaa
+# import utils.weather.Automold as am
+# from torchvision.utils import save_image
+# import torch
+# import cv2
+# import numpy as np
+# from scipy.ndimage import zoom as scizoom
+
+# import torch.nn.functional as F 
+# from utils.tps_grid_gen import TPSGridGen
+
+import os
 import sys
 sys.path.append('utils')
 
-
+import math
 import imgaug.augmenters as iaa
-import weather.Automold as am
+p = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(p)
+from utils.weather import Automold as am
 from torchvision.utils import save_image
 import torch
 import cv2
@@ -218,7 +236,8 @@ class ImageAddSunMono():
         
 
         # corruption severity-related parameters
-        sun_radius = [30, 40, 50, 60, 70][severity-1]
+        # sun_radius = [30, 40, 50, 60, 70][severity-1]
+        sun_radius = 20 + 0.5 * severity
         
         # corruption severity-independent parameters
         
@@ -228,8 +247,10 @@ class ImageAddSunMono():
 
         img_width = image.shape[1]
         img_height = image.shape[0]
-        sun_u_range = [0.25, 0.75]
-        sun_v_range = [0.30, 0.45]
+        # sun_u_range = [0.25, 0.75]
+        # sun_v_range = [0.30, 0.45]
+        sun_u_range = [0.45, 0.55]
+        sun_v_range = [0.25, 0.35]
         sun_u = np.random.uniform(*sun_u_range)*img_width
         sun_v = np.random.uniform(*sun_v_range)*img_height
         sun_uv = np.array([sun_u, sun_v])
@@ -485,6 +506,7 @@ class ImageBBoxOperationMono():
         else:
             # no change in image
             return image
+
 
      
 

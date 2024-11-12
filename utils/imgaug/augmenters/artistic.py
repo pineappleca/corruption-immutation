@@ -13,8 +13,9 @@ from __future__ import print_function, division, absolute_import
 
 import numpy as np
 import cv2
-
-from utils.imgaug.imgaug import _normalize_cv2_input_arr_
+import sys
+# sys.path.append('..')
+from imgaug import _normalize_cv2_input_arr_
 from . import meta
 from . import color as colorlib
 from .. import dtypes as iadt
