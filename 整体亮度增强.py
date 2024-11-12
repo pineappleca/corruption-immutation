@@ -11,16 +11,27 @@
 1. 模拟整体光照增强
 '''
 
+import os
 import cv2
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+
 #读取原始图像
 img = cv2.imread('nuscenes_example_pic/n008-2018-05-21-11-06-59-0400__CAM_BACK__1526915243037570.jpg')
 # img = cv2.imread('input.jpg', cv2.IMREAD_UNCHANGED)
-severity_ls = [20, 40, 60, 80]
-result = cv2.convertScaleAbs(img, alpha=1.0, beta=0)
-cv2.imwrite('./corruption_example_pic/test_light_.jpg', result)
+severity_ls = [20]
+output_filename = './light_aug_plot'
+if not os.path.exists(output_filename):
+    os.makedirs(output_filename)
+
+for i in range(len(severity_ls)):
+    beta = 20 + severity_ls[i]
+    result = cv2.convertScaleAbs(img, alpha=1.0, beta=beta)
+    result_uint8 = result.copy().astype(np.uint8)
+    print(result)
+    cv2.imwrite(os.path.join(output_filename, f'0{i + 1}.jpg'), result)
+    # cv2.imwrite('./corruption_example_pic/test_light_.jpg', result)
  
 # #获取图像行和列
 # rows, cols = img.shape[0], img.shape[1]
