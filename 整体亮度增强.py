@@ -32,7 +32,7 @@ for i in range(len(severity_ls)):
     print(result)
     cv2.imwrite(os.path.join(output_filename, f'0{i + 1}.jpg'), result)
     # cv2.imwrite('./corruption_example_pic/test_light_.jpg', result)
- 
+
 # #获取图像行和列
 # rows, cols = img.shape[0], img.shape[1]
  

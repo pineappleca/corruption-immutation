@@ -21,16 +21,21 @@ np.random.seed(2022)
 class CorruptionBase():
     def __init__(self, corruption_severity_dict={'sun_sim':0}):
         if 'sun_sim' in corruption_severity_dict:
+            self.sun_sim_severity = corruption_severity_dict['sun_sim']
             self.sun_sim = ImageAddSunMono(corruption_severity_dict['sun_sim'])
 
     def test(self, input_filename, output_filename):
         np.random.seed(2022)
         # 读取文件夹中的全部图片路径
+        '''
+        在10张不同image上测试
+        '''
         pic_path_ls = os.listdir(input_filename)
         for pic_path in pic_path_ls:
             pic_path = os.path.join(input_filename, pic_path)
             img_bgr_255_np_uint8 = cv2.imread(pic_path)
             img_rgb_255_np_uint8 = img_bgr_255_np_uint8[:, :, [2, 1, 0]]
+            # image_aug_rgb = cv2.convertScaleAbs(img_rgb_255_np_uint8, alpha=0.8, beta=-1000)
             image_aug_rgb = self.sun_sim(
                 image=img_rgb_255_np_uint8
             )
@@ -39,15 +44,20 @@ class CorruptionBase():
         #img_bgr_255_np_uint8 = cv2.imread(input_filename)
     
     def plot(self, pic_path, num, output_filename):
-
+        '''
+        在单张image上采用不同强度测试
+        '''
         if not os.path.exists(output_filename):
             os.makedirs(output_filename)
         
         np.random.seed(2022)
         img_bgr_255_np_uint8 = cv2.imread(pic_path)
         img_rgb_255_np_uint8 = img_bgr_255_np_uint8[:, :, [2, 1, 0]]
+        alpha = 1.0 - 0.005 * self.sun_sim_severity
+        # print(alpha)
+        image_aug_rgb = cv2.convertScaleAbs(img_rgb_255_np_uint8, alpha=alpha, beta=0)
         image_aug_rgb = self.sun_sim(
-            image=img_rgb_255_np_uint8
+            image=image_aug_rgb
         )
         image_aug_bgr = image_aug_rgb[:, :, [2, 1, 0]]
         output_path = os.path.join(output_filename, f'0{num}.jpg')
