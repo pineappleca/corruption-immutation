@@ -1220,7 +1220,7 @@ class ImageBBoxMotionBlurFrontBackMono():
         self.severity = severity
         self.corrpution = corrput_list[severity-1]
 
-    def __call__(self, image, cam2img, bboxes_centers, bboxes_corners, watch_img=False, file_path='') -> np.array:
+    def __call__(self, image, cam2img, bboxes_centers, bboxes_corners, watch_img=True, file_path='./11.jpg') -> np.array:
         """
             image should be numpy array : H * W * 3
             in uint8 (0~255) and RGB
@@ -1232,19 +1232,28 @@ class ImageBBoxMotionBlurFrontBackMono():
         canvas = image.copy()
         bboxes_num = bboxes_corners.shape[0]
         mask = np.zeros((canvas.shape[0],canvas.shape[1]))
+        # print(f'canvas_shape: {canvas.shape}')
+        # print(f'bbox_num: {bboxes_num}')
         for idx_b in range(bboxes_num):
             corners = bboxes_corners[idx_b]   # 8*3
+            # print(f'corners: {corners}')
             mask_temp = np.zeros_like(mask)
             corners_uvd = points_cam2img(corners, proj_mat=cam2img, with_depth=True)
+            # print(f'corners_uvd: {corners_uvd}')
             corners_uv = corners_uvd[:,:2]
             corners_depth = corners_uvd[:,2]
             corners_keep_flag = corners_depth > 0
             corners_uv = corners_uv[corners_keep_flag]
+            # print(f'corners_uv: {corners_uv}')
             if corners_uv.shape[0] == 0:
                 continue
             hull = cv2.convexHull(corners_uv.numpy().astype(np.int))
+            # # 裁剪 hull 的坐标，使其在图像区域内
+            # hull[:, 0, 0] = np.clip(hull[:, 0, 0], 0, canvas.shape[1] - 1)
+            # hull[:, 0, 1] = np.clip(hull[:, 0, 1], 0, canvas.shape[0] - 1)
+            # print(f'hull: {hull}')
             cv2.fillConvexPoly(mask_temp, hull, 1)
-
+            # print(f'mask_temp_positive: {np.where(mask_temp)}')
             mask = mask + mask_temp
         mask_bool_float = (mask>0).astype(np.float32)[:,:,None]
         image_aug_layer = self.zoom_blur(image_rgb_255, corrpution)
