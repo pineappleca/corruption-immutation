@@ -1,0 +1,1 @@
+https://sub.xfltd.bond/api/v1/client/subscribe?token=c58e37b673582eefc393cd42dd19a0fb

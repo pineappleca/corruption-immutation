@@ -20,18 +20,41 @@ import matplotlib.pyplot as plt
 #读取原始图像
 img = cv2.imread('nuscenes_example_pic/n008-2018-05-21-11-06-59-0400__CAM_BACK__1526915243037570.jpg')
 # img = cv2.imread('input.jpg', cv2.IMREAD_UNCHANGED)
-severity_ls = [20]
-output_filename = './light_aug_plot'
-if not os.path.exists(output_filename):
-    os.makedirs(output_filename)
+severity_ls = [0, 20, 40, 60, 80]
+aug_output_filename = './light_aug_plot'
+des_output_filename = './light_des_plot'
 
+if not os.path.exists(aug_output_filename):
+    os.makedirs(aug_output_filename)
+
+if not os.path.exists(des_output_filename):
+    os.makedirs(des_output_filename)
+
+# 整体亮度增强
+# for i in range(len(severity_ls)):
+#     beta = 20 + severity_ls[i]
+#     result = cv2.convertScaleAbs(img, alpha=1.0, beta=beta)
+#     result_uint8 = result.copy().astype(np.uint8)
+#     print(result)
+#     cv2.imwrite(os.path.join(output_filename, f'0{i + 1}.jpg'), result)
 for i in range(len(severity_ls)):
-    beta = 20 + severity_ls[i]
-    result = cv2.convertScaleAbs(img, alpha=1.0, beta=beta)
-    result_uint8 = result.copy().astype(np.uint8)
-    print(result)
-    cv2.imwrite(os.path.join(output_filename, f'0{i + 1}.jpg'), result)
-    # cv2.imwrite('./corruption_example_pic/test_light_.jpg', result)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+    v = cv2.add(v, 50 + 0.5 * severity_ls[i])
+    v = np.clip(v, 0, 255)
+    final_hsv = cv2.merge((h, s, v))
+    result = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    cv2.imwrite(os.path.join(aug_output_filename, f'0{i + 1}.jpg'), result)
+
+# # 整体亮度减弱
+# for i in range(len(severity_ls)):
+#     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+#     h, s, v = cv2.split(hsv)
+#     v = cv2.add(v, - 60 - 0.5 * severity_ls[i])
+#     v = np.clip(v, 0, 255)
+#     final_hsv = cv2.merge((h, s, v))
+#     result = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+#     cv2.imwrite(os.path.join(des_output_filename, f'0{i + 1}.jpg'), result)
 
 # #获取图像行和列
 # rows, cols = img.shape[0], img.shape[1]
